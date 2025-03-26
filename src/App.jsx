@@ -5,6 +5,10 @@ import Navbar from "./pages/Navbar";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/clerk-react";
 import CustomCursor from "./components/CustomCursor";
 import DashboardPage from "./pages/DashboardPage";
+import EmailReplies from "./pages/EmailReplies";
+import Calender from "./pages/Calender";
+import ResearchAssistant from "./pages/ResearchAssistant";
+import Summarize from "./pages/Summarize";
 
 function App() {
   return (
@@ -16,6 +20,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/emailreplies" element={ <EmailReplies/>} />
+            <Route path="/calender" element={ <Calender/>} />
+            <Route path="/researchassistant" element={<ResearchAssistant/> } />
+            <Route path="/summarize" element={ <Summarize/> } />
           </Routes>
         </div>
       </SignedIn>
@@ -30,3 +38,8 @@ function App() {
 }
 
 export default App;
+
+{/* <EmailReplies/>
+        <Calendar/>
+        <Summarize/>
+        <ResearchAssistant/> */}

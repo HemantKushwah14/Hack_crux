@@ -73,7 +73,7 @@ const Hero = () => {
           <Suspense fallback={null}>
             <Model />
           </Suspense>
-          <OrbitControls />
+          {/* <OrbitControls /> */}
         </Canvas>
       </div>
 
