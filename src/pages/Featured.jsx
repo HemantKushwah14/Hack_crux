@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { FaCheckCircle } from "react-icons/fa";
 
@@ -55,8 +55,6 @@ const Featureds = [
   },
 ];
 
-
-
 const FeaturedSection = () => {
   return (
     <section className="py-16 px-6 md:px-16 text-gray-900 dark:text-white transition-colors duration-300 ">
@@ -95,7 +93,7 @@ const FeaturedSection = () => {
                 ))}
               </ul>
               {project.link && (
-                <Link href={project.link} passHref>
+                <Link to={project.link}>
                   <Button className="mt-4" variant="default">
                     Visit Live Site →
                   </Button>
