@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Email Review System</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/Hack_crux/email_auto/static/style.css">
 </head>
 <body>
     <h1>Email Review and Approval</h1>
@@ -18,7 +18,7 @@
                 
                 <form action="/send/{{ email.id }}" method="post">
                     <label for="response">Review or Edit the Response:</label>
-                    <textarea id="response" name="user_response" rows="5" cols="50">{{ email.response }}</textarea>
+                    <textarea id="response" name="user_response" rows="5" cols="50" class="ans">{{ email.response }}</textarea>
                     
                     <input type="hidden" name="recipient" value="{{ email.sender }}">
                     <input type="hidden" name="subject" value="{{ email.subject }}">

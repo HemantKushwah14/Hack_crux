@@ -39,7 +39,4 @@ function App() {
 
 export default App;
 
-{/* <EmailReplies/>
-        <Calendar/>
-        <Summarize/>
-        <ResearchAssistant/> */}
+

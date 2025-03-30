@@ -1,119 +1,135 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
+import { authenticate, getEmails, generateResponse, sendReply } from "./Api";
+import { useUser } from "@clerk/clerk-react";
+import { Button } from '@/components/ui/button';
 
-const EmailReplies = () => {
-  const [email, setEmail] = useState("");
-  const [slots, setSlots] = useState([{ date: "", startTime: "", endTime: "" }]);
+function EmailReplies() {
+  const { user, isSignedIn } = useUser();
+  const [emails, setEmails] = useState([]);
+  const [responses, setResponses] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [showHtml, setShowHtml] = useState(false);
+  const [theme, setTheme] = useState('light');
+  const [error, setError] = useState('');
+
+  const fetchEmails = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      await authenticate();
+      const response = await getEmails();
+      setEmails(response.data);
+    } catch (error) {
+      console.error('Error fetching emails:', error);
+      setError('Failed to fetch emails. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGenerateResponse = async (emailId, emailBody) => {
+    try {
+      const response = await generateResponse(emailBody);
+      setResponses((prev) => ({ ...prev, [emailId]: response.data.response }));
+    } catch (error) {
+      console.error('Error generating response:', error);
+      setError('Failed to generate a response. Please try again.');
+    }
+  };
+
+  const handleSendReply = async (emailId, recipient, subject) => {
+    try {
+      const replyText = responses[emailId];
+      if (!replyText) {
+        alert('Generate a response first!');
+        return;
+      }
+      await sendReply(recipient, subject, replyText);
+      alert('Reply sent successfully!');
+    } catch (error) {
+      console.error('Error sending reply:', error);
+      setError('Failed to send reply. Please try again.');
+    }
+  };
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (
-      savedTheme === "dark" ||
-      (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches)
-    ) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    fetchEmails();
   }, []);
 
-  // Handle slot change
-  const handleSlotChange = (index, field, value) => {
-    const newSlots = [...slots];
-    newSlots[index][field] = value;
-    setSlots(newSlots);
-  };
-
-  // Add new slot
-  const addSlot = () => {
-    setSlots([...slots, { date: "", startTime: "", endTime: "" }]);
-  };
-
-  // Remove slot
-  const removeSlot = (index) => {
-    const newSlots = slots.filter((_, i) => i !== index);
-    setSlots(newSlots);
-  };
-
-  // Submit availability
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      console.log("Submitting:", { email, freeSlots: slots });
-      alert("Free time slots updated!");
-    } catch (error) {
-      console.error("Error saving slots:", error);
-      alert("Failed to save slots. Please try again.");
-    }
-  };
-
   return (
-    <div className="  flex flex-col items-center justify-center min-h-fit p-6 transition-all duration-500 text-gray-900 dark:text-white">
-      <div className="w-full max-w-xl p-6 rounded-2xl shadow-lg border transition-all duration-500 bg-white border-purple-900 dark:bg-gray-800 dark:border-purple-700">
-        <h2 className="text-3xl font-bold text-center mb-6">📅 Set Your Availability</h2>
+    <div className={`${theme} min-h-screen py-10  dark:from-gray-900 dark:to-gray-800 transition-all duration-500`}>      
+      <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-xl shadow-lg">        
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl font-extrabold text-gray-800 dark:text-white"> Email Replies</h1>
 
-        {/* Email Input Field */}
-        <div className="relative w-full mb-4">
-          <input
-            type="email"
-            placeholder="Your Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-3 rounded-lg border border-purple-600 dark:border-purple-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:outline-none transition"
-          />
+          {isSignedIn ? (
+            <div className="text-gray-600 dark:text-gray-300">
+              Welcome, <span className="font-semibold">{user?.primaryEmailAddress?.emailAddress}</span>
+            </div>
+          ) : (
+            <p className="text-red-500">Please sign in to access emails.</p>
+          )}
+
+<Button
+            onClick={() => setShowHtml(!showHtml)}
+          
+          >
+            {showHtml ? 'Close HTML Page' : 'Show HTML Page'}
+         </Button>
         </div>
 
-        {/* Date & Time Slot Inputs */}
-        {slots.map((slot, index) => (
-          <div key={index} className="flex flex-col space-y-3 mb-4 p-4 rounded-lg border border-purple-600 dark:border-purple-600 bg-gray-50 dark:bg-gray-900">
-            <label className="text-sm font-medium">Select Date:</label>
-            <input
-              type="date"
-              value={slot.date}
-              onChange={(e) => handleSlotChange(index, "date", e.target.value)}
-              className="p-3 rounded-lg border border-purple-600 dark:border-purple-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:outline-none transition"
-            />
+        {error && <p className="text-red-500 mb-4">{error}</p>}
 
-            <div className="flex space-x-2">
-              <div className="flex flex-col w-1/2">
-                <label className="text-sm font-medium">Start Time:</label>
-                <input
-                  type="time"
-                  value={slot.startTime}
-                  onChange={(e) => handleSlotChange(index, "startTime", e.target.value)}
-                  className="p-3 rounded-lg border border-purple-600 dark:border-purple-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:outline-none transition"
-                />
-              </div>
+        {showHtml && (
+          <iframe
+            src={`http://localhost:5000?theme=${theme}`}
+            title="Email Review"
+            className="w-full h-[800px] border rounded-lg mb-6"
+          />
+        )}
 
-           
-            </div>
-
-            <button
-              onClick={() => removeSlot(index)}
-              className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition transform hover:scale-105 shadow-lg w-full"
-            >
-              ❌ Remove Slot
-            </button>
+        {loading ? (
+          <div className="flex flex-col items-center">
+            <div className="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+            <p className="text-gray-600 dark:text-gray-400 mt-4">Fetching emails, please wait...</p>
           </div>
-        ))}
+        ) : emails.length === 0 ? (
+          <p className="text-gray-600 dark:text-gray-400">No new emails available.</p>
+        ) : (
+          emails.map((email) => (
+            <div key={email.id} className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-md mb-6">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">From: {email.sender}</h3>
+              <p className="text-gray-600 dark:text-gray-300">Subject: {email.subject}</p>
+              <p className="text-gray-700 dark:text-gray-400 my-4">{email.body}</p>
 
-        {/* Add Slot Button */}
-        <button
-          onClick={addSlot}
-          className="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition transform hover:scale-105 shadow-lg mb-4"
-        >
-          ➕ Add Slot
-        </button>
+              <button
+                onClick={() => handleGenerateResponse(email.id, email.body)}
+                className="px-4 py-2 mr-2 bg-green-500 hover:bg-green-600 text-white rounded-lg"
+              >
+                Generate Response
+              </button>
 
-        {/* Save Availability Button */}
-        <button
-          onClick={handleSubmit}
-          className="w-full p-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition transform hover:scale-105 shadow-lg"
-        >
-          ✅ Save Availability
-        </button>
+              {responses[email.id] && (
+                <>
+                  <textarea
+                    className="w-full p-3 mt-4 bg-gray-100 dark:bg-gray-700 rounded-lg"
+                    value={responses[email.id]}
+                    readOnly
+                  />
+                  <button
+                    onClick={() => handleSendReply(email.id, email.sender, email.subject)}
+                    className="mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg"
+                  >
+                    Send Reply
+                  </button>
+                </>
+              )}
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
-};
+}
 
 export default EmailReplies;
