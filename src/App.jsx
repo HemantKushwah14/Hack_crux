@@ -57,6 +57,8 @@ import DashboardPage from "./pages/DashboardPage";
 import Calender from "./pages/Calender";
 import ResearchAssistant from "./pages/ResearchAssistant";
 import Summarize from "./pages/Summarize";
+import EmailReplies from "./pages/EmailReplies";
+
 
 function App() {
   return (
@@ -68,11 +70,11 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/emailreplies" element={<iframe src="/index.html" style={{ width: "100%", height: "100vh", border: "none" }} />} />
-            {/* <Route path="/emailreplies" element={<EmailReplies />} /> Correct route for EmailReplies */}
+            {/* <Route path="/emailreplies" element={<iframe src="/index.html" style={{ width: "100%", height: "100vh", border: "none" }} />} /> */}
+            <Route path="/emailreplies" element={<EmailReplies/>} /> 
             <Route path="/calender" element={<Calender />} />
             <Route path="/researchassistant" element={<ResearchAssistant />} />
-            <Route path="/summarize" element={<Summarize />} />
+            <Route path="/summarize" element={<Summarize/>} />
           </Routes>
         </div>
       </SignedIn>
