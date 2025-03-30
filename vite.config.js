@@ -12,6 +12,13 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  json: {
+    namedExports: true,
+    stringify: true
+  },
+  optimizeDeps: {
+    force: true,
+  },
   define: {
     "process.env": {}, 
   },
