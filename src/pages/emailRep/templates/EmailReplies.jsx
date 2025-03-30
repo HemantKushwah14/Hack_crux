@@ -78,3 +78,12 @@
 // };
 
 // export default EmailReview;
+import React from 'react'
+
+function EmailReplies() {
+  return (
+    <div>EmailReplies</div>
+  )
+}
+
+export default EmailReplies
